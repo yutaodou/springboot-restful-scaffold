@@ -1,0 +1,43 @@
+services:
+  dev:
+    image: gradle:7.5.1-jdk17
+    working_dir: /app
+    volumes:
+      - .:/app
+      - gradle-cache:/home/gradle/.gradle
+    networks:
+      - app_net
+    environment:
+      DB_HOST: database
+      DB_PORT: 3306
+      DB_NAME: todo
+      DB_USER: root
+      DB_PASSWORD: password
+      SPRING_PROFILES_ACTIVE: local
+      SPRING_JPA_SHOW_SQL: 'true'
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    command: gradle bootRun
+    depends_on:
+      - database
+
+  database:
+    image: mysql:8.0.31
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: todo
+    networks:
+      - app_net
+    volumes:
+      - db-cache:/var/lib/mysql
+    ports:
+      - "3306:3306"
+
+networks:
+  app_net:
+
+volumes:
+  gradle-cache:
+  db-cache:

@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -ex
+echo "git hooks pre-push execute start..."
+
+BASE_DIR=$(dirname "$0")
+
+cd "$BASE_DIR/../.."
+
+./scripts/check-style
+./scripts/test
+
+echo "git hooks pre-push execute end..."
+

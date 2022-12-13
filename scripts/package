@@ -1,0 +1,14 @@
+#!/bin/bash
+set -ex
+
+BASE_DIR=$(dirname "$0")
+
+cd "$BASE_DIR/.."
+
+# Build fat jar with all dependencies packed in
+if [ "${CI}" == "true" ]; then
+    echo "running on CI"
+    JAVA_HOME=/opt/java/openjdk gradle clean bootJar
+else
+    ./gradlew clean bootJar
+fi

@@ -1,0 +1,135 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.5'
+    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'java'
+    id 'pmd'
+    id 'com.diffplug.spotless' version '6.11.0'
+    id 'jacoco'
+}
+
+group = 'com.dytes'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 17
+targetCompatibility = 17
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+
+    implementation 'com.google.guava:guava:31.1-jre'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.2.Final'
+
+    runtimeOnly 'org.flywaydb:flyway-mysql'
+    runtimeOnly 'mysql:mysql-connector-java:8.0.31'
+
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.1'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.8.1'
+    testImplementation 'org.mockito:mockito-core:4.8.1'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+    testImplementation 'ch.vorburger.mariaDB4j:mariaDB4j:2.6.0'
+    testImplementation 'org.mariadb.jdbc:mariadb-java-client:3.0.6'
+    testImplementation 'org.assertj:assertj-core:3.23.1'
+
+    // lombok
+    compileOnly 'org.projectlombok:lombok:1.18.24'
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+
+    // compile 'com.diffplug.spotless:spotless-plugin-gradle:6.11.0'
+    // compileOnly 'com.diffplug.spotless:spotless-lib:2.30.0'
+    // compileOnly 'com.diffplug.spotless:spotless-lib-extra:2.30.0'
+
+
+    // mapstruct
+    implementation 'org.mapstruct:mapstruct:1.5.3.Final'
+    annotationProcessor "org.mapstruct:mapstruct-processor:1.5.3.Final"
+}
+
+pmd {
+    toolVersion = "6.39.0"
+    ruleSetFiles = files("config/pmd/pmd.xml")
+    ruleSets = []
+}
+
+spotless {
+    // ratchetFrom 'origin/master'
+
+    java {
+        palantirJavaFormat("2.27.0")
+        importOrder('', 'javax', 'java', '\\#')
+        formatAnnotations()
+        removeUnusedImports()
+        endWithNewline()
+        trimTrailingWhitespace()
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+    reports {
+        xml.required = false
+        html.required = true
+    }
+}
+
+jacocoTestCoverageVerification {
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.0 // Set a proper coverage target
+            }
+        }
+    }
+}
+
+tasks.register('installGitHooks', Copy) {
+    from './scripts/pre-commit','./scripts/pre-push'
+    into './.git/hooks'
+}
+
+test {
+    useJUnitPlatform()
+    exclude "com/example/todo/integration/**"
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+}
+
+task integrationTest(type: Test) {
+    useJUnitPlatform()
+    include "com/example/todo/integration/**"
+    mustRunAfter test
+
+    beforeTest { descriptor ->
+        logger.lifecycle("Running test: " + descriptor)
+    }
+
+    onOutput { descriptor, event ->
+        logger.lifecycle(event.message)
+    }
+}
+
+bootRun {
+    jvmArgs = ["-Xdebug", "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=0.0.0.0:5005"]
+}
+
+check {
+    dependsOn 'integrationTest', 'installGitHooks'
+}

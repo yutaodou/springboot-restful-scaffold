@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [ $# -eq 0 ]
+then
+    echo "No DEPLOY_TO arguments exist"
+    echo "DEPLOY_TO: [dev/qa/uat/prod]"
+    exit 1
+else
+    DEPLOY_TO=$1
+
+    echo "Deploy ${docker_registry}/${DOCKER_IMAGE} To ${DEPLOY_TO}  ..."
+    sed -i "s/ImageTag/${DOCKER_IMAGE_TAG}/g" ${kustomize_path}/kustomization.yaml
+    kubectl apply -k ${kustomize_path}
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
+
+    echo "Waiting for deploy completed ..."
+    kubectl rollout status deployment ${deployment_name} -n ${namespace}
+    if [ $? -ne 0 ]; then
+        exit 1
+    fi
+
+    echo "Deploy completed"
+fi

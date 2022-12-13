@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -ex
+
+BASE_DIR=$(dirname "$0")
+
+cd "$BASE_DIR/.."
+
+# Enforce code style spotless and pmd
+if [ "${CI}" == "true" ]; then
+    echo "running on CI"
+    JAVA_HOME=/opt/java/openjdk gradle spotlessJavaCheck pmdMain pmdTest
+else
+    ./gradlew spotlessJavaCheck pmdMain pmdTest
+fi

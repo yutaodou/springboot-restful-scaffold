@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    driver-class-name: org.mariadb.jdbc.Driver
+    username: root
+    hikari:
+      maximum-pool-size: 10
+    url: jdbc:mariadb://localhost:60000/todo?permitMysqlScheme&characterEncoding=utf8
+  jpa:
+    spring:
+      jpa:
+        database-platform: org.hibernate.dialect.MySQL57Dialect

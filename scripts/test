@@ -1,0 +1,15 @@
+#!/bin/bash
+set -ex
+
+BASE_DIR=$(dirname "$0")
+
+cd "$BASE_DIR/.."
+
+# Run unit test and integration test
+# Generate test coverage report and verify
+if [ "${CI}" == "true" ]; then
+    echo "running on CI"
+    JAVA_HOME=/opt/java/openjdk gradle test integrationTest jacocoTestReport jacocoTestCoverageVerification
+else
+    ./gradlew test integrationTest jacocoTestReport jacocoTestCoverageVerification
+fi
