@@ -1,6 +1,6 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.5'
-    id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'org.springframework.boot' version '3.0.0'
+    id 'io.spring.dependency-management' version '1.1.0'
     id 'java'
     id 'pmd'
     id 'com.diffplug.spotless' version '6.11.0'
@@ -25,10 +25,11 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.hibernate.javax.persistence:hibernate-jpa-2.1-api:1.0.2.Final'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
 
     runtimeOnly 'org.flywaydb:flyway-mysql'
     runtimeOnly 'mysql:mysql-connector-java:8.0.31'
+    runtimeOnly 'org.springframework.boot:spring-boot-properties-migrator'
 
     implementation 'org.springdoc:springdoc-openapi-ui:1.6.12'
 
@@ -48,11 +49,6 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.24'
     annotationProcessor 'org.projectlombok:lombok:1.18.24'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
-
-    // compile 'com.diffplug.spotless:spotless-plugin-gradle:6.11.0'
-    // compileOnly 'com.diffplug.spotless:spotless-lib:2.30.0'
-    // compileOnly 'com.diffplug.spotless:spotless-lib-extra:2.30.0'
-
 
     // mapstruct
     implementation 'org.mapstruct:mapstruct:1.5.3.Final'
